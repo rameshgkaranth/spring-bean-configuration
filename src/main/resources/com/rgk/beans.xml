@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<!-- Default scope of beans in Spring is SINGLETON, the spring singleton is
+		is best described as per container per bean -->
+	<bean id="person" class="com.rgk.beans.Person">
+		<constructor-arg name="id" type="int" value="123"/>
+		<constructor-arg name="firstName" type="String" value="Ramesh"/>
+		<constructor-arg name="lastName" type="String" value="Karanth"/>
+		<property name="aadharNumber" value="SDFP-83454-XMZN-32"></property>
+		<property name="address" ref="address"/>
+	</bean>
+	
+	<!-- If we create another bean with a different ID for the same class, 
+		Spring container returns a different instance -->
+	<bean id="anotherPerson" class="com.rgk.beans.Person">
+		<constructor-arg name="id" type="int" value="123"/>
+		<constructor-arg name="firstName" type="String" value="Ramesh"/>
+		<constructor-arg name="lastName" type="String" value="Karanth"/>
+		<property name="aadharNumber" value="SDFP-83454-XMZN-32"></property>
+		<property name="address" ref="address"/>
+	</bean>
+
+	<!-- init-method and destroy-method defined in bean are called as a part 
+		of Spring bean life cycle after the bean properties are set and
+		bean is getting destroyed -->
+	<bean id="address" class="com.rgk.beans.Address"
+		destroy-method="destroy" init-method="init">
+		<constructor-arg name="addressLine1" type="String" value="#A-121, Flash Towers"/>
+		<constructor-arg name="addressLine2" type="String" value="Hobbits valley"/>
+		<constructor-arg name="cityCode" type="String" value="Shire"/>
+		<constructor-arg name="stateCode" type="String" value="Green Ville"/>
+		<constructor-arg name="zipCode" type="String" value="34533"/>
+	</bean>
+	
+	<!-- In contrast to the other scopes, Spring does not manage the complete 
+		lifecycle of a prototype bean: the container instantiates, configures 
+		& assembles a prototype object and hands it to the client, with no further 
+		record of that prototype instance. Thus, although initialization lifecycle 
+		callback methods are called on all objects regardless of scope, in the case 
+		of prototypes, configured destruction lifecycle callbacks are not called. -->
+	<bean id="anotherAddress" class="com.rgk.beans.Address"
+		destroy-method="destroy" init-method="init" scope="prototype">
+		<constructor-arg name="addressLine1" type="String" value="#A-121, Flash Towers"/>
+		<constructor-arg name="addressLine2" type="String" value="Hobbits valley"/>
+		<constructor-arg name="cityCode" type="String" value="Shire"/>
+		<constructor-arg name="stateCode" type="String" value="Green Ville"/>
+		<constructor-arg name="zipCode" type="String" value="34533"/>
+	</bean>
+	
+	<!-- P-Namespace is a succinct and an alternative to using property tag 
+		to perform dependency injection. If attributes need to refer to other 
+		beans then p:xxx-ref should be assigned a bean reference as shown below -->
+	<bean id="pNameSpace" class="com.rgk.beans.PNameSpace" 
+		p:property1="String 1"
+		p:property2="String 2"
+		p:property3="123"
+		p:property4="123.456"
+		p:address-ref="address">
+	</bean>
+	
+	<!-- Bean creation using factory-method. This needs a static method within the
+		same bean for creation purpose. If there are arguments to the factory
+		method same can be passed using constructor-arg.
+		 
+		NOTE: Parameterized factory method means that we cannot have parameterized
+		constructor -->
+	<bean id="farmFreshPizza" class="com.rgk.beans.FarmFreshPizza" scope="prototype"
+		init-method="onPizzaCreate" destroy-method="onPizzaDestroy" 
+		factory-method="getInstance">
+		<constructor-arg name="veggiesList">
+			<list>
+				<value>Spring Onion's</value>
+				<value>Olive Tomatoe's</value>
+				<value>Bell Pepper</value>
+				<value>Sweet corn</value>
+				<value>Papprika</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg name="spicesList">
+			<list>
+				<value>Chilli flakes</value>
+				<value>Rosemary leaves</value>
+				<value>Secret ingredients</value>
+			</list>
+		</constructor-arg>
+		<property name="name" value="Farm Fresh Exotica"/>
+	</bean>
+	
+	<bean id="pizzaFactory" class="com.rgk.beans.PizzaFactory" factory-method="getPizza">
+	</bean>
+</beans>
